@@ -12,17 +12,51 @@
   const storageKey = 'casualidades-mapa-v2';
   const topics = [
     { title: 'La gota', category: 'AGUA · CERCA', image: 'img/gota.png', alt: 'Una gota de agua', text: 'Una corriente encuentra una salida. Del azar aparece una dirección; de esa dirección, otras.', color: '#9bcdb5' },
-    { title: 'La raíz', category: 'TIERRA · BAJO LA SUPERFICIE', image: 'img/ombu.jpg', alt: 'Raíces de un ombú', text: 'A oscuras, una raíz tantea el terreno. Crecer también es buscar sin saber dónde termina el camino.', color: '#c1a880' },
+
+    { title: 'Los árboles', category: 'ÁRBOL · RAÍCES', image: 'img/arbol.jpg', alt: 'Un árbol y su ramaje', text: 'Una copa y unas raíces se despliegan en sentidos contrarios; ambas exploran el espacio.', color: '#b3b38c' },
+    { title: 'Los árboles', category: 'ÁRBOL · RAÍCES', image: 'img/arbol2.jpeg', alt: 'Un árbol y su ramaje', text: 'El tronco se divide en brazos que tantean el aire hasta encontrar un claro.', color: '#b3b38c' },
+    { title: 'Los árboles', category: 'ÁRBOL · RAÍCES', image: 'img/arbol3.jpg', alt: 'Un árbol y su ramaje', text: 'Cada rama vuelve a repetir el gesto del tronco, en una escala más pequeña.', color: '#b3b38c' },
+    { title: 'Los árboles', category: 'ÁRBOL · RAÍCES', image: 'img/arbol4.jpeg', alt: 'Un árbol y su ramaje', text: 'La copa convierte la búsqueda de luz en un dibujo que se abre hacia el cielo.', color: '#b3b38c' },
+    { title: 'Los árboles', category: 'ÁRBOL · RAÍCES', image: 'img/arbol5.jpg', alt: 'Un árbol y su ramaje', text: 'Un mismo impulso se separa, se aleja y vuelve a multiplicarse.', color: '#b3b38c' },
+    { title: 'Los árboles', category: 'ÁRBOL · RAÍCES', image: 'img/arbol6.jpg', alt: 'Un árbol y su ramaje', text: 'Las ramas guardan el registro de cómo el árbol ocupó su espacio.', color: '#b3b38c' },
+    { title: 'Los árboles', category: 'ÁRBOL · RAÍCES', image: 'img/arbol7.jpg', alt: 'Un árbol y su ramaje', text: '¿Se parece a un río porque ambos aprendieron a rodear obstáculos?', color: '#b3b38c' },
+    { title: 'Los árboles', category: 'ÁRBOL · RAÍCES', image: 'img/arbol8.jpg', alt: 'Un árbol y su ramaje', text: 'Debajo de la copa, las raíces repiten en silencio su mapa invertido.', color: '#b3b38c' },
+
+    { title: 'La raíz', category: 'TIERRA · BAJO LA SUPERFICIE', image: 'img/raices2.jpg', alt: 'Raíces de un ombú', text: 'A oscuras, una raíz tantea el terreno. Crecer también es buscar sin saber dónde termina el camino.', color: '#c1a880' },
+    { title: 'La raíz', category: 'TIERRA · BAJO LA SUPERFICIE', image: 'img/raices.jpg', alt: 'Raíces de un ombú', text: 'Sin ver el destino, las raíces se abren paso y encuentran otras rutas bajo tierra.', color: '#c1a880' },
+
     { title: 'El río', category: 'PAISAJE · DISTANCIA', image: 'img/rio_parana.jpg', alt: 'Un curso de agua visto desde arriba', text: 'El agua rodea lo que encuentra. Con el tiempo, cada desvío se vuelve cauce y memoria.', color: '#89b8bf' },
+    { title: 'El río', category: 'PAISAJE · DISTANCIA', image: 'img/rio2.jpg', alt: 'Un curso de agua visto desde arriba', text: 'El cauce se divide, se reúne y continúa cambiando con el terreno.', color: '#89b8bf' },
+    { title: 'El río', category: 'PAISAJE · DISTANCIA', image: 'img/rio3.jpg', alt: 'Un curso de agua visto desde arriba', text: 'Desde lejos, el agua dibuja sobre la tierra las huellas de su recorrido.', color: '#89b8bf' },
+
     { title: 'La hoja', category: 'VEGETAL · DETALLE', image: 'img/hoja1.jpg', alt: 'Nervaduras de una hoja', text: 'Una vena principal se reparte en venas menores: el dibujo de la vida llevando agua hacia la luz.', color: '#a9cc91' },
-    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: '', alt: '', text: 'Partículas que vagan al azar quedan pegadas al tocar un agregado. Poco a poco, el azar dibuja una forma.', color: '#d0bd91' },
-    { title: 'El coral', category: 'MAR · COLONIA', image: '', alt: '', text: 'Una colonia vive como muchas. Cada organismo suma un pequeño borde a una arquitectura compartida.', color: '#c7888d' },
-    { title: 'El rayo', category: 'CIELO · INSTANTE', image: '', alt: '', text: 'La descarga encuentra el paso de menor resistencia. El cielo escribe, en un instante, una ruta ramificada.', color: '#d7ad82' },
-    { title: 'El helecho', category: 'VEGETAL · REPETICIÓN', image: 'img/hoja2.jpg', alt: 'Una forma vegetal de hojas pequeñas', text: 'Un patrón se repite a otra escala. En el helecho, cada parte contiene el gesto de la forma entera.', color: '#a8c785' },
-    { title: 'La ágata dendrítica', category: 'MINERAL · TIEMPO LENTO', image: '', alt: '', text: 'Dentro de la piedra, inclusiones minerales parecen ramas detenidas. Un paisaje aparece donde no hubo semilla.', color: '#c2a889' },
-    { title: 'La hoja de roble', category: 'VEGETAL · RAMIFICACIÓN', image: 'img/roble_vivo.jpeg', alt: 'Hojas de roble', text: 'La luz y el agua recorren una estructura de caminos pequeños, repetidos a escala de una hoja.', color: '#91b984' },
-    { title: 'El ombú', category: 'ÁRBOL · RAÍCES', image: 'img/ombu.jpg', alt: 'Un ombú y su ramaje', text: 'Una copa y unas raíces se despliegan en sentidos contrarios; ambas exploran el espacio.', color: '#b3b38c' },
-    { title: 'La vena de la hoja', category: 'VEGETAL · FLUJO', image: 'img/hoja3.jpg', alt: 'Detalle de una hoja y sus nervaduras', text: 'Las nervaduras distribuyen agua y sostén. El dibujo hace visible un sistema de conexiones.', color: '#a3c99a' }
+    { title: 'La hoja', category: 'VEGETAL · DETALLE', image: 'img/hoja5.jpg', alt: 'Nervaduras de una hoja', text: 'Una red delicada distribuye el agua hasta los bordes más pequeños.', color: '#a9cc91' },
+    { title: 'La hoja', category: 'VEGETAL · DETALLE', image: 'img/hoja6.jpg', alt: 'Nervaduras de una hoja', text: 'El patrón se bifurca para sostener una superficie entera con líneas mínimas.', color: '#a9cc91' },
+    { title: 'La hoja', category: 'VEGETAL · DETALLE', image: 'img/hoja7.jpg', alt: 'Nervaduras de una hoja', text: 'Una vena principal se vuelve muchas: una cartografía viva hecha de flujo.', color: '#a9cc91' },
+    { title: 'La hoja', category: 'VEGETAL · DETALLE', image: 'img/hoja8.jpg', alt: 'Nervaduras de una hoja', text: 'Al mirar de cerca, cada ramita parece repetir la forma de la hoja completa.', color: '#a9cc91' },
+    { title: 'La hoja', category: 'VEGETAL · DETALLE', image: 'img/hoja9.jpg', alt: 'Nervaduras de una hoja', text: '¿Es un dibujo, o el rastro visible de algo que está circulando?', color: '#a9cc91' },
+
+    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: 'img/DLA.png', alt: '', text: 'Partículas que vagan al azar quedan pegadas al tocar un agregado. Poco a poco, el azar dibuja una forma.', color: '#d0bd91' },
+    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: 'img/DLA2.png', alt: '', text: 'Un agregado crece cuando nuevas partículas quedan atrapadas en su borde.', color: '#d0bd91' },
+    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: 'img/DLA3.png', alt: '', text: 'Cada encuentro es azaroso; la forma final parece seguir una regla.', color: '#d0bd91' },
+
+    { title: 'El coral', category: 'MAR · COLONIA', image: 'img/coral.jpg', alt: '', text: 'Una colonia vive como muchas. Cada organismo suma un pequeño borde a una arquitectura compartida.', color: '#c7888d' },
+    { title: 'El coral', category: 'MAR · COLONIA', image: 'img/coral2.jpg', alt: '', text: 'Muchos organismos diminutos dejan una huella común sobre el arrecife.', color: '#c7888d' },
+    { title: 'El coral', category: 'MAR · COLONIA', image: 'img/coral3.jpg', alt: '', text: 'La colonia construye lentamente una figura que ningún individuo dibuja solo.', color: '#c7888d' },
+    { title: 'El coral', category: 'MAR · COLONIA', image: 'img/coral4.jpg', alt: '', text: 'Bajo el agua, la vida ramificada ofrece refugio a otras formas de vida.', color: '#c7888d' },
+
+    { title: 'El rayo', category: 'CIELO · INSTANTE', image: 'img/rayo.jpg', alt: 'Rayo', text: 'La descarga encuentra el paso de menor resistencia. El cielo escribe, en un instante, una ruta ramificada.', color: '#d7ad82' },
+    { title: 'El rayo', category: 'CIELO · INSTANTE', image: 'img/rayo2.jpg', alt: 'Rayo', text: 'La descarga se abre en caminos breves antes de encontrar tierra.', color: '#d7ad82' },
+    { title: 'El rayo', category: 'CIELO · INSTANTE', image: 'img/rayo3.jpg', alt: 'Rayo', text: 'Por una fracción de segundo, la tormenta hace visible su red.', color: '#d7ad82' },
+
+    { title: 'La ágata dendrítica', category: 'MINERAL · TIEMPO LENTO', image: 'img/agata.jpg', alt: '', text: 'Dentro de la piedra, inclusiones minerales parecen ramas detenidas. Un paisaje aparece donde no hubo semilla.', color: '#c2a889' },
+    { title: 'La ágata dendrítica', category: 'MINERAL · TIEMPO LENTO', image: 'img/agata2.jpg', alt: '', text: 'La piedra guarda un paisaje mineral que recuerda a las ramas de un árbol.', color: '#c2a889' },
+    { title: 'La ágata dendrítica', category: 'MINERAL · TIEMPO LENTO', image: 'img/agata3.jpg', alt: '', text: 'Sin crecer ni moverse, las inclusiones parecen conservar el gesto de una bifurcación.', color: '#c2a889' },
+
+    { title: 'La vena de la hoja', category: 'VEGETAL · FLUJO', image: 'img/hoja3.jpg', alt: 'Detalle de una hoja y sus nervaduras', text: 'Las nervaduras distribuyen agua y sostén. El dibujo hace visible un sistema de conexiones.', color: '#a3c99a' },
+    { title: 'La vena de la hoja', category: 'VEGETAL · FLUJO', image: 'img/hoja2.jpg', alt: 'Detalle de una hoja y sus nervaduras', text: 'Las líneas se ramifican para que el agua alcance cada parte de la hoja.', color: '#a3c99a' },
+    { title: 'La vena de la hoja', category: 'VEGETAL · FLUJO', image: 'img/hoja4.jpg', alt: 'Detalle de una hoja y sus nervaduras', text: 'Una red de caminos sostiene el tejido y acompaña su crecimiento.', color: '#a3c99a' },
+
   ];
   const colors = topics.map(topic => topic.color);
 
