@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#091513" />
-  <meta name="description" content="Una obra interactiva sobre las formas que se repiten en la naturaleza y la huella que deja cada encuentro." />
-  <title>¿Casualidades? — una obra que sigue creciendo</title>
+  <meta name="description" content="Un mapa interactivo de imágenes y palabras sobre formas ramificadas que se repiten en la naturaleza." />
+  <title>¿Casualidades? — mapa de formas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -13,13 +13,17 @@
 </head>
 <body>
   <main class="experience" id="experience">
-    <canvas id="growth" aria-label="Estructura de ramificaciones interactiva"></canvas>
-    <div class="grain" aria-hidden="true"></div>
-    <div class="echo-mark" id="echoMark" aria-hidden="true"></div>
+    <div class="map-stage" id="mapStage" aria-label="Mapa interactivo de imágenes y textos. Mantené el click para sumar nuevas conexiones.">
+      <div class="map-world" id="mapWorld">
+        <svg class="connections" id="connections" aria-hidden="true"></svg>
+        <div class="map-nodes" id="mapNodes"></div>
+      </div>
+    </div>
+    <div class="ambient" aria-hidden="true"></div>
 
     <header class="topbar">
       <a class="wordmark" href="#experience" aria-label="¿Casualidades? Inicio"><span class="wordmark-icon">✳</span> CUADERNO DE FORMAS</a>
-      <span class="live-state"><i></i><span id="memoryLabel">UN PUNTO EN POTENCIA</span></span>
+      <span class="live-state" id="liveState"><i></i><span id="memoryLabel">UN MAPA EN POTENCIA</span></span>
     </header>
 
     <section class="intro" aria-labelledby="title">
@@ -28,32 +32,28 @@
       <p class="lede">Tantas formas parecidas.<br /><em>¿Son realmente casualidades?</em></p>
     </section>
 
-    <section class="phenomenon" id="phenomenon" aria-live="polite" aria-atomic="true">
-      <div class="phenomenon-image-wrap">
-        <img id="phenomenonImage" src="img/gota.png" alt="" />
-        <span class="image-index" id="imageIndex">01 / 09</span>
-      </div>
-      <div class="phenomenon-copy">
-        <p class="card-kicker">UNA FORMA, OTRO MUNDO</p>
-        <h2 id="phenomenonTitle">La gota</h2>
-        <p id="phenomenonText">Una corriente encuentra una salida. Del azar aparece una dirección; de esa dirección, otras.</p>
-        <span class="card-coordinate" id="phenomenonScale">AGUA · CERCA</span>
-      </div>
-    </section>
-
     <aside class="interaction-hint" id="interactionHint" aria-live="polite">
-      <span class="hint-icon" aria-hidden="true">↗</span>
-      <span id="hintText">Deslizá el cursor y soplá una dirección</span>
-      <span class="hint-divider"></span>
-      <span class="hint-alt">Girá · Acercá con la rueda</span>
+      <span class="hint-icon" aria-hidden="true">✳</span>
+      <span id="hintText">Posicioná el mouse y mantené el click para sumar imágenes y palabras</span>
+    </aside>
+
+    <aside class="map-tools" aria-label="Controles del mapa">
+      <div class="zoom-controls">
+        <button type="button" id="zoomOut" aria-label="Alejar">−</button>
+        <span id="zoomLabel">100%</span>
+        <button type="button" id="zoomIn" aria-label="Acercar">+</button>
+      </div>
+      <button type="button" class="tool-button" id="fitMap">Ver mapa completo <span>⤢</span></button>
+      <button type="button" class="tool-button restart-button" id="restart">Reiniciar <span>↺</span></button>
+      <span class="map-count" id="mapCount">0 fragmentos · 0 ecos</span>
     </aside>
 
     <footer class="footer">
       <div class="footer-copy"><span>La forma que hacés también te está mirando.</span><span class="footer-credit">Integrantes: Juan Carol Lugones y Germán Zariz Lüchter | 2026<br />Artes Multimediales 1 | Cátedra Groisman</span></div>
-      <div class="footer-tools"><span class="memory-count" id="memoryCount">0 huellas compartidas</span><button id="returnButton" type="button" aria-label="Volver al punto inicial">VOLVER AL PUNTO <span>↺</span></button></div>
+      <span class="footer-note">Una huella queda a la vista cuando empieza otra.</span>
     </footer>
-    <span class="edge-note edge-note-left">IMAGEN EN MOVIMIENTO</span>
-    <span class="edge-note edge-note-right" id="scaleNote">ESCALA 01 · GOTA</span>
+    <span class="edge-note edge-note-left">MAPA EN EXPANSIÓN</span>
+    <span class="edge-note edge-note-right">IMAGEN · PALABRA · VÍNCULO</span>
   </main>
   <script src="script.js"></script>
 </body>

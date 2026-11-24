@@ -1,215 +1,272 @@
 (() => {
-  const canvas = document.querySelector('#growth');
-  const ctx = canvas.getContext('2d');
-  const card = document.querySelector('#phenomenon');
-  const image = document.querySelector('#phenomenonImage');
-  const phenomenonTitle = document.querySelector('#phenomenonTitle');
-  const phenomenonText = document.querySelector('#phenomenonText');
-  const scaleLabel = document.querySelector('#phenomenonScale');
-  const imageIndex = document.querySelector('#imageIndex');
+  const stage = document.querySelector('#mapStage');
+  const world = document.querySelector('#mapWorld');
+  const nodeLayer = document.querySelector('#mapNodes');
+  const connections = document.querySelector('#connections');
+  const liveState = document.querySelector('#liveState');
   const memoryLabel = document.querySelector('#memoryLabel');
-  const memoryCount = document.querySelector('#memoryCount');
+  const interactionHint = document.querySelector('#interactionHint');
   const hintText = document.querySelector('#hintText');
-  const scaleNote = document.querySelector('#scaleNote');
-  const hint = document.querySelector('#interactionHint');
-  const savedKey = 'casualidades-topologias-v1';
-  const motifs = [
-    { name: 'La gota', family: 'AGUA', image: 'img/gota.png', alt: 'Gota de agua ramificándose', text: 'Una corriente encuentra una salida. Del azar aparece una dirección; de esa dirección, otras.', scale: 'AGUA · CERCA' },
-    { name: 'La raíz', family: 'TIERRA', image: 'img/ombu.jpg', alt: 'Raíces de un ombú', text: 'A oscuras, una raíz tantea el terreno. Crecer también es buscar sin saber dónde termina el camino.', scale: 'TIERRA · BAJO LA SUPERFICIE' },
-    { name: 'El río', family: 'AGUA', image: 'img/rio_parana.jpg', alt: 'Un curso de agua visto desde arriba', text: 'El agua rodea lo que encuentra. Con el tiempo, cada desvío se vuelve cauce y memoria.', scale: 'PAISAJE · DISTANCIA' },
-    { name: 'La hoja', family: 'VEGETAL', image: 'img/hoja1.jpg', alt: 'Detalle de las nervaduras de una hoja', text: 'Una vena principal se reparte en venas menores: el dibujo de la vida llevando agua hacia la luz.', scale: 'VEGETAL · DETALLE' },
-    { name: 'La DLA', family: 'MATERIA', image: '', alt: '', text: 'Partículas que vagan al azar quedan pegadas al tocar un agregado. Poco a poco, el azar dibuja una forma.', scale: 'DLA · PARTÍCULAS' },
-    { name: 'El coral', family: 'MAR', image: '', alt: '', text: 'Una colonia vive como muchas. Cada organismo suma un pequeño borde a una arquitectura compartida.', scale: 'MAR · COLONIA' },
-    { name: 'El rayo', family: 'CIELO', image: '', alt: '', text: 'La descarga encuentra el paso de menor resistencia. El cielo escribe, en un instante, una ruta ramificada.', scale: 'CIELO · INSTANTE' },
-    { name: 'El helecho', family: 'VEGETAL', image: 'img/hoja2.jpg', alt: 'Detalle vegetal con forma de helecho', text: 'Un patrón se repite a otra escala. En el helecho, cada parte contiene el gesto de la forma entera.', scale: 'VEGETAL · REPETICIÓN' },
-    { name: 'La ágata dendrítica', family: 'MINERAL', image: '', alt: '', text: 'Dentro de la piedra, inclusiones minerales parecen ramas detenidas. Un paisaje aparece donde no hubo semilla.', scale: 'MINERAL · TIEMPO LENTO' }
+  const mapCount = document.querySelector('#mapCount');
+  const zoomLabel = document.querySelector('#zoomLabel');
+  const storageKey = 'casualidades-mapa-v2';
+  const topics = [
+    { title: 'La gota', category: 'AGUA · CERCA', image: 'img/gota.png', alt: 'Una gota de agua', text: 'Una corriente encuentra una salida. Del azar aparece una dirección; de esa dirección, otras.', color: '#9bcdb5' },
+    { title: 'La raíz', category: 'TIERRA · BAJO LA SUPERFICIE', image: 'img/ombu.jpg', alt: 'Raíces de un ombú', text: 'A oscuras, una raíz tantea el terreno. Crecer también es buscar sin saber dónde termina el camino.', color: '#c1a880' },
+    { title: 'El río', category: 'PAISAJE · DISTANCIA', image: 'img/rio_parana.jpg', alt: 'Un curso de agua visto desde arriba', text: 'El agua rodea lo que encuentra. Con el tiempo, cada desvío se vuelve cauce y memoria.', color: '#89b8bf' },
+    { title: 'La hoja', category: 'VEGETAL · DETALLE', image: 'img/hoja1.jpg', alt: 'Nervaduras de una hoja', text: 'Una vena principal se reparte en venas menores: el dibujo de la vida llevando agua hacia la luz.', color: '#a9cc91' },
+    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: '', alt: '', text: 'Partículas que vagan al azar quedan pegadas al tocar un agregado. Poco a poco, el azar dibuja una forma.', color: '#d0bd91' },
+    { title: 'El coral', category: 'MAR · COLONIA', image: '', alt: '', text: 'Una colonia vive como muchas. Cada organismo suma un pequeño borde a una arquitectura compartida.', color: '#c7888d' },
+    { title: 'El rayo', category: 'CIELO · INSTANTE', image: '', alt: '', text: 'La descarga encuentra el paso de menor resistencia. El cielo escribe, en un instante, una ruta ramificada.', color: '#d7ad82' },
+    { title: 'El helecho', category: 'VEGETAL · REPETICIÓN', image: 'img/hoja2.jpg', alt: 'Una forma vegetal de hojas pequeñas', text: 'Un patrón se repite a otra escala. En el helecho, cada parte contiene el gesto de la forma entera.', color: '#a8c785' },
+    { title: 'La ágata dendrítica', category: 'MINERAL · TIEMPO LENTO', image: '', alt: '', text: 'Dentro de la piedra, inclusiones minerales parecen ramas detenidas. Un paisaje aparece donde no hubo semilla.', color: '#c2a889' },
+    { title: 'La hoja de roble', category: 'VEGETAL · RAMIFICACIÓN', image: 'img/roble_vivo.jpeg', alt: 'Hojas de roble', text: 'La luz y el agua recorren una estructura de caminos pequeños, repetidos a escala de una hoja.', color: '#91b984' },
+    { title: 'El ombú', category: 'ÁRBOL · RAÍCES', image: 'img/ombu.jpg', alt: 'Un ombú y su ramaje', text: 'Una copa y unas raíces se despliegan en sentidos contrarios; ambas exploran el espacio.', color: '#b3b38c' },
+    { title: 'La vena de la hoja', category: 'VEGETAL · FLUJO', image: 'img/hoja3.jpg', alt: 'Detalle de una hoja y sus nervaduras', text: 'Las nervaduras distribuyen agua y sostén. El dibujo hace visible un sistema de conexiones.', color: '#a3c99a' }
   ];
-  const colors = ['174,218,194', '183,174,137', '136,184,191', '169,212,145', '207,193,153', '192,135,140', '215,178,139', '160,206,134', '194,173,137'];
+  const colors = topics.map(topic => topic.color);
 
-  let width = 0, height = 0, dpr = 1;
-  let nodes = [], tips = [], echo = null;
-  let active = false, pointerDown = false, pointer = { x: .5, y: .5 }, lastPointer = null;
-  let lastGrowth = 0, lastSave = 0, lastMove = 0, inactivityStarted = 0, turns = 0, zoom = 0;
-  let lastMotif = -1;
-  const pointerType = { fine: matchMedia('(pointer:fine)').matches };
+  let nodes = [];
+  let scale = 1, panX = 0, panY = 0;
+  let active = false, pinchMode = false, spaceDown = false, panMode = false;
+  let activePointer = null, seedPoint = null, latestPoint = null, branchStep = 0;
+  let nextGrowth = 0, lastSave = 0, lastPointerClient = null;
+  let pinchStart = null, panStart = null;
+  const pointers = new Map();
+  let nextId = 1;
   const rand = (min, max) => min + Math.random() * (max - min);
-  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const finePointer = matchMedia('(pointer:fine)').matches;
 
-  function readMemories() {
+  function stageSize() {
+    const rect = stage.getBoundingClientRect();
+    return { rect, width: rect.width, height: rect.height };
+  }
+  function worldPoint(clientX, clientY) {
+    const { rect } = stageSize();
+    return { x: (clientX - rect.left - panX) / scale, y: (clientY - rect.top - panY) / scale };
+  }
+  function updateTransform() {
+    world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    zoomLabel.textContent = `${Math.round(scale * 100)}%`;
+  }
+  function updateCounts() {
+    const total = nodes.length;
+    const archived = nodes.reduce((count, node) => count + (node.archived ? 1 : 0), 0);
+    mapCount.textContent = `${total} ${total === 1 ? 'fragmento' : 'fragmentos'} · ${archived} ${archived === 1 ? 'eco' : 'ecos'}`;
+  }
+  function setActive(value) {
+    active = value;
+    liveState.classList.toggle('is-growing', active);
+    if (active) {
+      memoryLabel.textContent = 'EL MAPA SIGUE CRECIENDO';
+      interactionHint.classList.add('is-hidden');
+    } else if (nodes.length) {
+      memoryLabel.textContent = 'EL MAPA QUEDA EN PAUSA';
+      if (nodes.length < 2) interactionHint.classList.remove('is-hidden');
+    }
+  }
+  function getMemories() {
     try {
-      const list = JSON.parse(localStorage.getItem(savedKey) || '[]');
-      return Array.isArray(list) ? list.filter(item => Array.isArray(item.nodes)) : [];
+      const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      return Array.isArray(stored) ? stored : [];
     } catch { return []; }
   }
-  function updateMemoryCount() {
-    const total = readMemories().length;
-    memoryCount.textContent = `${total} ${total === 1 ? 'eco en este navegador' : 'ecos en este navegador'}`;
-    memoryLabel.textContent = echo ? 'UN ECO TE PRECEDE' : 'UN PUNTO EN POTENCIA';
+  function saveMap() {
+    if (!nodes.length) return;
+    const tail = nodes.slice(-450);
+    const keptIds = new Set(tail.map(node => node.id));
+    const saved = tail.map(node => ({
+      id: node.id,
+      topic: node.topic,
+      type: node.type,
+      x: node.x,
+      y: node.y,
+      parent: keptIds.has(node.parent) ? node.parent : null,
+      archived: true
+    }));
+    try { localStorage.setItem(storageKey, JSON.stringify(saved)); }
+    catch { /* La obra sigue funcionando si el navegador no permite guardar. */ }
+    lastSave = performance.now();
   }
-  function resize() {
-    const rect = canvas.getBoundingClientRect();
-    width = Math.max(1, rect.width); height = Math.max(1, rect.height);
-    dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    if (!nodes.length) reset(false);
+  function addLoadedNode(item) {
+    if (!Number.isFinite(item.x) || !Number.isFinite(item.y) || !Number.isInteger(item.topic) || !topics[item.topic]) return;
+    const id = Number.isInteger(item.id) ? item.id : nextId;
+    const node = { ...item, id, type: item.type === 'image' ? 'image' : 'text', archived: true };
+    nextId = Math.max(nextId, id + 1);
+    nodes.push(node);
+    renderNode(node, false);
   }
-  function origin() { return { x: width * .54, y: height * .57 }; }
-  function reset(keepTrace = true) {
-    if (keepTrace && nodes.length > 1) saveTopology();
-    const point = origin();
-    nodes = [{ x: point.x, y: point.y, parent: -1, born: performance.now(), depth: 0, energy: 1 }];
-    tips = [0]; active = false; pointerDown = false; inactivityStarted = 0;
-    memoryLabel.textContent = echo ? 'UN ECO TE PRECEDE' : 'UN PUNTO EN POTENCIA';
-    hint.classList.remove('is-hidden');
+  function restoreMap() {
+    getMemories().forEach(addLoadedNode);
+    updateConnections(); updateCounts();
+    if (nodes.length) memoryLabel.textContent = 'UN ECO TE PRECEDE';
   }
-  function saveTopology() {
-    if (nodes.length < 8) return;
-    // Keep the earliest part of the tree so every saved parent index remains valid.
-    const snapshot = nodes.slice(0, 650).map(n => ({ x: n.x / width, y: n.y / height, parent: n.parent, depth: n.depth }));
-    try {
-      const list = readMemories();
-      list.push({ at: Date.now(), nodes: snapshot });
-      localStorage.setItem(savedKey, JSON.stringify(list.slice(-16)));
-      updateMemoryCount();
-    } catch { /* La obra sigue funcionando si el navegador no permite guardar. */ }
+  function makeElement(tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
   }
-  function installEcho() {
-    const list = readMemories();
-    if (list.length) echo = list[Math.floor(Math.random() * list.length)];
-    updateMemoryCount();
+  function renderNode(node, animate = true) {
+    const topic = topics[node.topic];
+    const card = makeElement('article', `map-node ${node.type === 'image' ? 'image-node' : 'text-node'}${node.archived ? ' archive' : ''}`);
+    card.style.left = `${node.x}px`; card.style.top = `${node.y}px`; card.style.setProperty('--node-color', colors[node.topic]);
+    card.dataset.nodeId = node.id;
+    if (!animate) card.style.animation = 'none';
+    if (node.type === 'image' && topic.image) {
+      const img = document.createElement('img'); img.src = topic.image; img.alt = topic.alt; img.draggable = false;
+      img.addEventListener('error', () => { card.replaceChildren(makeTextContent(topic)); card.classList.remove('image-node'); card.classList.add('text-node'); }, { once: true });
+      card.append(img);
+      const cap = makeElement('div', 'node-cap'); cap.append(makeElement('p', 'node-kicker', topic.category), makeElement('h2', 'node-title', topic.title));
+      card.append(cap);
+    } else card.append(makeTextContent(topic));
+    nodeLayer.append(card);
+    node.element = card;
   }
-  function chooseMotif(force = false, fixedIndex = -1) {
-    if (!force && motifs.length < 2) return;
-    let index = fixedIndex >= 0 ? fixedIndex % motifs.length : Math.floor(Math.random() * motifs.length);
-    if (index === lastMotif) index = (index + 1 + Math.floor(Math.random() * (motifs.length - 1))) % motifs.length;
-    lastMotif = index;
-    const m = motifs[index];
-    card.classList.add('is-changing');
-    window.setTimeout(() => {
-      phenomenonTitle.textContent = m.name;
-      phenomenonText.textContent = m.text;
-      scaleLabel.textContent = m.scale;
-      scaleNote.textContent = `ESCALA ${String(index + 1).padStart(2, '0')} · ${m.name.toLocaleUpperCase('es')}`;
-      imageIndex.textContent = `${String(index + 1).padStart(2, '0')} / ${String(motifs.length).padStart(2, '0')}`;
-      if (m.image) { image.src = m.image; image.alt = m.alt; image.closest('.phenomenon-image-wrap').style.visibility = 'visible'; }
-      else { image.removeAttribute('src'); image.alt = ''; image.closest('.phenomenon-image-wrap').style.visibility = 'hidden'; }
-      card.classList.remove('is-changing');
-    }, 160);
+  function makeTextContent(topic) {
+    const content = makeElement('div', 'node-text');
+    content.append(makeElement('p', 'node-kicker', topic.category), makeElement('h2', 'node-title', topic.title), makeElement('p', 'node-description', topic.text), makeElement('p', 'node-meta', 'UNA FORMA · OTRA ESCALA'));
+    return content;
   }
-  function stepMotif(direction) {
-    chooseMotif(true, (lastMotif + (direction >= 0 ? 1 : -1) + motifs.length) % motifs.length);
-  }
-  function setActive(on) {
-    active = on;
-    document.querySelector('.live-state').classList.toggle('is-growing', on);
-    if (on) { inactivityStarted = 0; hint.classList.add('is-hidden'); memoryLabel.textContent = 'UNA NUEVA RAMA APARECE'; }
-    else if (nodes.length > 1 && !inactivityStarted) { inactivityStarted = performance.now(); }
-  }
-  function addNode(now) {
-    if (!tips.length || nodes.length > 1500) return;
-    const x = pointer.x * width, y = pointer.y * height;
-    let best = tips[0], bestDist = Infinity;
-    for (const i of tips) {
-      const n = nodes[i], d = (n.x - x) ** 2 + (n.y - y) ** 2;
-      if (d < bestDist) { bestDist = d; best = i; }
+  function nodeById(id) { return nodes.find(node => node.id === id); }
+  function updateConnections() {
+    const { width, height } = stageSize();
+    connections.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    connections.replaceChildren();
+    for (const node of nodes) {
+      const parent = node.parent === null ? null : nodeById(node.parent);
+      if (!parent) continue;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const dx = node.x - parent.x, dy = node.y - parent.y;
+      const curve = `M ${parent.x} ${parent.y} C ${parent.x + dx * .42} ${parent.y + dy * .08}, ${parent.x + dx * .58} ${parent.y + dy * .92}, ${node.x} ${node.y}`;
+      path.setAttribute('d', curve); path.setAttribute('class', `connection${node.archived ? ' archive-connection' : ''}`);
+      connections.append(path);
     }
-    const from = nodes[best];
-    let angle = Math.atan2(y - from.y, x - from.x);
-    if (bestDist < 18000) angle = angle * .68 + Math.atan2(from.y - origin().y, from.x - origin().x) * .32;
-    else angle = Math.atan2(from.y - origin().y, from.x - origin().x) + rand(-.48, .48);
-    angle += rand(-.4, .4);
-    const speed = pointerDown ? 1.25 : 1;
-    const length = rand(7, 17) * speed * (pointerType.fine ? 1 : 1.25);
-    const child = { x: from.x + Math.cos(angle) * length, y: from.y + Math.sin(angle) * length, parent: best, born: now, depth: from.depth + 1, energy: 1 };
-    if (child.x < 8 || child.x > width - 8 || child.y < 8 || child.y > height - 8) { tips.splice(tips.indexOf(best), 1); return; }
-    nodes.push(child); const ci = nodes.length - 1;
-    const ix = tips.indexOf(best); if (ix >= 0) tips.splice(ix, 1);
-    tips.push(ci);
-    if (Math.random() < (pointerDown ? .29 : .2) && tips.length < 260) {
-      const a = angle + rand(-1.12, 1.12), fork = { x: from.x + Math.cos(a) * length * .82, y: from.y + Math.sin(a) * length * .82, parent: best, born: now, depth: from.depth + 1, energy: .78 };
-      nodes.push(fork); tips.push(nodes.length - 1);
-    }
-    if (Math.random() < .012) chooseMotif();
   }
-  function drawBranchSet(list, alpha, old = false) {
-    if (!list) return;
-    ctx.lineCap = 'round';
-    for (let i = 1; i < list.length; i++) {
-      const n = list[i], p = list[n.parent]; if (!p) continue;
-      const x1 = old ? p.x * width : p.x, y1 = old ? p.y * height : p.y;
-      const x2 = old ? n.x * width : n.x, y2 = old ? n.y * height : n.y;
-      const age = performance.now() - (n.born || 0);
-      const life = old ? 1 : clamp(1 - Math.max(0, age - 10000) / 15000, .06, 1);
-      const a = alpha * life * (old ? .55 : 1);
-      const depth = n.depth || 1, line = Math.max(.55, 2.0 - depth * .026);
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-      ctx.strokeStyle = old ? `rgba(156,193,156,${a})` : `rgba(${depth % 4 ? colors[Math.max(0, lastMotif)] : '219,178,133'},${a})`;
-      ctx.setLineDash(!old && lastMotif === 4 ? [1.4, 1.8] : []);
-      ctx.lineWidth = old ? .7 : (lastMotif === 5 ? line * 1.28 : line); ctx.shadowBlur = old ? 0 : 5; ctx.shadowColor = 'rgba(177,226,181,.32)'; ctx.stroke();
+  function nearestParent(x, y, maxDistance = Infinity) {
+    let nearest = null, distance = maxDistance;
+    for (const node of nodes) {
+      const d = Math.hypot(node.x - x, node.y - y);
+      if (d < distance) { nearest = node; distance = d; }
     }
-    ctx.shadowBlur = 0;
+    return nearest;
   }
-  function draw(now) {
-    ctx.clearRect(0, 0, width, height);
-    if (echo && echo.nodes.length > 1) drawBranchSet(echo.nodes, .24, true);
-    const point = origin();
-    // La luz del origen queda como una pregunta cuando todas las ramas se han ido.
-    const glow = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, 39);
-    glow.addColorStop(0, 'rgba(219,226,184,.20)'); glow.addColorStop(.12, 'rgba(196,220,185,.075)'); glow.addColorStop(1, 'rgba(196,220,185,0)');
-    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(point.x, point.y, 39, 0, Math.PI * 2); ctx.fill();
-    drawBranchSet(nodes, 1);
-    ctx.beginPath(); ctx.arc(point.x, point.y, 1.6, 0, Math.PI * 2); ctx.fillStyle = '#edf1d7'; ctx.fill();
-
-    if (active && now - lastGrowth > (pointerDown ? 43 : 74)) { addNode(now); lastGrowth = now; }
-    if (active && now - lastMove > 850) setActive(false);
-    if (inactivityStarted && now - inactivityStarted > 19000) {
-      saveTopology(); reset(false); inactivityStarted = 0;
-      memoryLabel.textContent = 'EL PUNTO CONSERVA UNA HUELLA';
-      window.setTimeout(() => { if (!active) memoryLabel.textContent = echo ? 'UN ECO TE PRECEDE' : 'UN PUNTO EN POTENCIA'; }, 3000);
-    }
-    if (now - lastSave > 12000 && nodes.length > 15) { saveTopology(); lastSave = now; }
-    // Las ramas delgadas se desvanecen mientras las primeras conservan por más tiempo la huella.
-    if (nodes.length > 1) {
-      const retained = nodes.filter((n, i) => i === 0 || now - n.born < (n.depth < 3 ? 30000 : 24000));
-      if (retained.length < nodes.length) {
-        const kept = new Set(retained); const remap = new Map(); const next = [];
-        retained.forEach((n, i) => { remap.set(nodes.indexOf(n), i); next.push({ ...n, parent: n.parent < 0 ? -1 : (remap.get(n.parent) ?? 0) }); });
-        nodes = next; tips = tips.map(i => remap.get(i)).filter(i => i !== undefined);
+  function createCard(point) {
+    const topicIndex = Math.floor(Math.random() * topics.length);
+    const topic = topics[topicIndex];
+    const makeImage = Boolean(topic.image) && Math.random() < .58;
+    const angleToCursor = seedPoint && latestPoint ? Math.atan2(latestPoint.y - seedPoint.y, latestPoint.x - seedPoint.x) : rand(0, Math.PI * 2);
+    const angle = angleToCursor + (branchStep % 2 ? 1 : -1) * rand(.22, .98) + rand(-.28, .28);
+    const distance = branchStep === 0 ? 0 : rand(48, 102) + Math.min(branchStep, 8) * 10;
+    const x = point.x + Math.cos(angle) * distance;
+    const y = point.y + Math.sin(angle) * distance;
+    const parent = nearestParent(x, y);
+    const node = { id: nextId++, topic: topicIndex, type: makeImage ? 'image' : 'text', x, y, parent: parent ? parent.id : null, archived: false };
+    nodes.push(node); renderNode(node);
+    updateConnections(); updateCounts();
+    branchStep++;
+    if (nodes.length === 1) interactionHint.classList.add('is-hidden');
+  }
+  function beginGrowth(e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    if (e.pointerType === 'touch') {
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size >= 2) {
+        setActive(false); pinchMode = true;
+        const points = [...pointers.values()];
+        const mid = { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
+        pinchStart = { distance: Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y), scale, world: worldPoint(mid.x, mid.y) };
+        return;
       }
     }
-    requestAnimationFrame(draw);
-  }
-  function pointFromEvent(e) {
-    const rect = canvas.getBoundingClientRect();
-    pointer.x = clamp((e.clientX - rect.left) / rect.width, 0, 1);
-    pointer.y = clamp((e.clientY - rect.top) / rect.height, 0, 1);
-    lastMove = performance.now();
-    if (lastPointer) {
-      const dx = e.clientX - lastPointer.x, dy = e.clientY - lastPointer.y;
-      turns += dx * .006 + dy * .003;
-      if (Math.abs(turns) > 2.8) { stepMotif(turns); turns = 0; }
+    if (spaceDown || e.button === 1) {
+      panMode = true; panStart = { x: e.clientX, y: e.clientY, panX, panY };
+      return;
     }
-    lastPointer = { x: e.clientX, y: e.clientY };
-    setActive(true);
+    activePointer = e.pointerId; stage.setPointerCapture?.(e.pointerId);
+    latestPoint = worldPoint(e.clientX, e.clientY); seedPoint = { ...latestPoint }; branchStep = 0;
+    setActive(true); createCard(latestPoint); nextGrowth = performance.now() + 440;
   }
-  canvas.addEventListener('pointermove', e => pointFromEvent(e));
-  canvas.addEventListener('pointerdown', e => { pointerDown = true; canvas.setPointerCapture?.(e.pointerId); pointFromEvent(e); });
-  canvas.addEventListener('pointerup', () => { pointerDown = false; });
-  canvas.addEventListener('pointercancel', () => { pointerDown = false; });
-  canvas.addEventListener('pointerleave', () => { if (!pointerDown) { lastPointer = null; setActive(false); } });
-  canvas.addEventListener('wheel', e => {
-    e.preventDefault(); zoom += Math.sign(e.deltaY);
-    if (Math.abs(zoom) >= 2) { stepMotif(zoom); zoom = 0; }
+  function movePointer(e) {
+    if (e.pointerType === 'touch' && pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pinchMode && pointers.size >= 2 && pinchStart) {
+      const points = [...pointers.values()];
+      const mid = { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
+      const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+      applyZoom(pinchStart.scale * distance / Math.max(1, pinchStart.distance), mid, pinchStart.world);
+      return;
+    }
+    if (panMode && panStart) {
+      panX = panStart.panX + e.clientX - panStart.x; panY = panStart.panY + e.clientY - panStart.y; updateTransform(); return;
+    }
+    if (e.pointerId !== activePointer) return;
+    latestPoint = worldPoint(e.clientX, e.clientY);
+    lastPointerClient = { x: e.clientX, y: e.clientY };
+  }
+  function endPointer(e) {
+    if (e.pointerType === 'touch') pointers.delete(e.pointerId);
+    if (activePointer === e.pointerId) { activePointer = null; setActive(false); saveMap(); }
+    if (panMode) { panMode = false; panStart = null; }
+    if (pinchMode && pointers.size === 0) { pinchMode = false; pinchStart = null; }
+  }
+  function applyZoom(nextScale, screenPoint, anchorWorld) {
+    const { rect } = stageSize();
+    const localX = screenPoint.x - rect.left, localY = screenPoint.y - rect.top;
+    scale = clamp(nextScale, .35, 2.8);
+    panX = localX - anchorWorld.x * scale; panY = localY - anchorWorld.y * scale;
+    updateTransform();
+  }
+  function zoomAt(nextScale, x, y) { applyZoom(nextScale, { x, y }, worldPoint(x, y)); }
+  function fitMap() {
+    if (!nodes.length) { scale = 1; panX = 0; panY = 0; updateTransform(); return; }
+    const { width, height } = stageSize();
+    const minX = Math.min(...nodes.map(n => n.x - (n.type === 'image' ? 105 : 100)));
+    const maxX = Math.max(...nodes.map(n => n.x + 105));
+    const minY = Math.min(...nodes.map(n => n.y - 100));
+    const maxY = Math.max(...nodes.map(n => n.y + 100));
+    const contentWidth = Math.max(220, maxX - minX), contentHeight = Math.max(180, maxY - minY);
+    scale = clamp(Math.min((width - 100) / contentWidth, (height - 180) / contentHeight), .35, 1.5);
+    panX = (width - contentWidth * scale) / 2 - minX * scale;
+    panY = (height - contentHeight * scale) / 2 - minY * scale;
+    updateTransform();
+  }
+  function archiveCurrentMap() {
+    setActive(false); activePointer = null;
+    for (const node of nodes) { node.archived = true; node.element?.classList.add('archive'); }
+    updateConnections(); saveMap(); updateCounts();
+    memoryLabel.textContent = nodes.length ? 'EL MAPA ANTERIOR QUEDA COMO ECO' : 'UN MAPA EN POTENCIA';
+    interactionHint.classList.remove('is-hidden');
+  }
+  function animationFrame(now) {
+    if (active && now >= nextGrowth) {
+      if (latestPoint) createCard(latestPoint);
+      const moved = lastPointerClient ? Math.hypot(latestPoint.x - seedPoint.x, latestPoint.y - seedPoint.y) : 0;
+      nextGrowth = now + clamp(510 - moved * 1.4, 260, 510);
+    }
+    if (nodes.length && now - lastSave > 7000) saveMap();
+    requestAnimationFrame(animationFrame);
+  }
+
+  stage.addEventListener('pointerdown', beginGrowth);
+  stage.addEventListener('pointermove', movePointer);
+  stage.addEventListener('pointerup', endPointer);
+  stage.addEventListener('pointercancel', endPointer);
+  stage.addEventListener('lostpointercapture', endPointer);
+  stage.addEventListener('wheel', e => {
+    e.preventDefault();
+    zoomAt(scale * (e.deltaY < 0 ? 1.12 : .89), e.clientX, e.clientY);
   }, { passive: false });
-  document.querySelector('#returnButton').addEventListener('click', () => { saveTopology(); reset(); chooseMotif(true); });
-  window.addEventListener('resize', resize);
-  installEcho();
-  // Elegí un referente al azar para que el mismo inicio nunca se repita del todo.
-  const initial = Math.floor(Math.random() * motifs.length);
-  lastMotif = (initial - 1 + motifs.length) % motifs.length;
-  chooseMotif();
-  hintText.textContent = pointerType.fine ? 'Deslizá el cursor y soplá una dirección' : 'Deslizá el dedo y abrí un camino';
-  resize();
-  requestAnimationFrame(draw);
+  document.addEventListener('keydown', e => { if (e.code === 'Space' && !e.repeat) { spaceDown = true; e.preventDefault(); } });
+  document.addEventListener('keyup', e => { if (e.code === 'Space') spaceDown = false; });
+  document.querySelector('#zoomIn').addEventListener('click', () => { const { width, height } = stageSize(); zoomAt(scale * 1.2, width / 2, height / 2); });
+  document.querySelector('#zoomOut').addEventListener('click', () => { const { width, height } = stageSize(); zoomAt(scale / 1.2, width / 2, height / 2); });
+  document.querySelector('#fitMap').addEventListener('click', fitMap);
+  document.querySelector('#restart').addEventListener('click', archiveCurrentMap);
+  window.addEventListener('resize', () => { updateConnections(); });
+
+  hintText.textContent = finePointer ? 'Posicioná el mouse y mantené el click para sumar imágenes y palabras · rueda para zoom · espacio + arrastre para moverte' : 'Mantené el dedo en un punto para sumar imágenes y palabras · pellizcá para ver de cerca';
+  restoreMap();
+  updateTransform();
+  requestAnimationFrame(animationFrame);
 })();
