@@ -1,42 +1,33 @@
-# DERIVA — Prototipo 04 (corrección de encuadre)
+# ¿Casualidades?
 
-Prototipo interactivo de redes urbanas ramificadas, inspirado en la DLA y el recorrido por Recoleta.
+Obra web interactiva para Artes Multimediales 1, Cátedra Groisman. Una ramificación aparece con el movimiento del cursor o del dedo y conecta, al azar, la gota, las raíces, los ríos, las hojas, la DLA y otras formas del mundo natural.
 
-## Para abrir
+## Publicar en GitHub Pages
 
-1. Descomprimí el ZIP.
-2. En Visual Studio Code, abrí esa carpeta (Archivo → Abrir carpeta).
-3. Abrí `index.html` y presioná **Go Live** (extensión Live Server).
-4. Esperá a ver las calles en el mapa y presioná **Generar recorrido**.
+La página es estática: no necesita servidor propio, compilación ni dependencias de JavaScript. Para publicarla, subí la carpeta del proyecto a un repositorio de GitHub y, en **Settings → Pages**, elegí la rama y la carpeta donde está `index.html` (normalmente `main` y `/ (root)`).
 
-También puede abrirse `index.html` directamente, pero Live Server es preferible.
+También podés abrir `index.html` directamente o usar Live Server desde Visual Studio Code.
 
-## Corrección de la versión 04
+## Interacción
 
-- Se corrigió el error `Cannot read properties of undefined (reading 'layerPointToLatLng')`, que aparecía al generar un recorrido.
-- El fallo venía de calcular los límites de un círculo de Leaflet que no estaba agregado al mapa. Ahora los límites geográficos se calculan directamente desde el punto inicial y el radio.
-- Se reemplazaron **las dos** llamadas problemáticas (al preparar las calles y al comenzar la animación).
+- Mové el cursor para hacer crecer las ramas como si soplaras una gota; mantené presionado para darles más impulso. En el celular, deslizá el dedo.
+- Girá el recorrido para encontrar otras formas. Usá la rueda del mouse o el gesto de acercar/alejar para cambiar de escala y de referente.
+- Si dejás de intervenir, las ramas finas se desvanecen. Al volver al punto inicial queda un eco de la sesión.
+- Las topologías se guardan en `localStorage` de ese navegador y pueden aparecer como un eco en visitas posteriores desde el mismo navegador. Cada instalación del navegador conserva su propio archivo de huellas.
 
-## Qué cambió respecto a las primeras versiones
+## Imágenes
 
-- Quitamos las consultas a los servidores Overpass que se cancelaban después de 18 segundos.
-- El prototipo **lee las calles reales de los mosaicos vectoriales ya cargados en OpenFreeMap**, sin hacer una segunda consulta al presionar Generar recorrido.
-- Para obtener el grafo de calles, detecta los trazos de las calles visibles, conecta sus extremos e intersecciones, y anima una red de ramificaciones. Algunos cruces de distinto nivel o calles con geometría simplificada podrían no estar representados con precisión.
-- Sigue usando una conexión a internet **para el mapa inicial, las bibliotecas y sus mosaicos**. No sirve sin conexión.
-- Los datos disponibles dependen del nivel de zoom y de las teselas que estén cargadas. No es un sistema de navegación y no valida transitabilidad, acceso, obras ni seguridad.
-- Puede haber diferencias entre las líneas generadas y los recorridos peatonales reales. La red es generativa, no una ruta garantizada.
+La carpeta `img/` ya incluye `gota.png`, `ombu.jpg`, `roble_vivo.jpeg`, `rio_parana.jpg`, `hoja1.jpg`, `hoja2.jpg` y `hoja3.jpg`; la obra usa algunas como referentes al azar. No hace falta instalar nada para probarla.
 
-## Controles
+Para agregar otra imagen, guardala dentro de `img/` (por ejemplo `coral.jpg`) y agregá o editá un objeto de la lista `motifs` en `script.js`:
 
-- Zona: Recoleta, Palermo, San Telmo o punto personalizado.
-- Escala (radio) e intensidad de bifurcación.
-- Generar, pausar, continuar, limpiar y exportar GeoJSON.
-- Guardado local de la última red.
+```js
+{ name: 'El coral', family: 'MAR', image: 'img/coral.jpg', alt: 'Estructura ramificada de un coral', text: 'Una colonia construye una forma compartida.', scale: 'MAR · COLONIA' }
+```
 
-## Archivos
+Si la imagen es solo decorativa, podés dejar `image: ''`; la tarjeta muestra igual el texto del fenómeno. Se aceptan rutas relativas bajo `img/` y formatos habituales de navegador como JPG, PNG, WebP o GIF.
 
-- `index.html`: estructura y mapa.
-- `styles.css`: diseño responsive.
-- `script.js`: generación, red vectorial, mapa y exportación.
+## Créditos
 
-**Créditos de datos de base:** © OpenStreetMap contributors y OpenFreeMap. Prototipo de concepto inspirado en procesos de ramificación estocástica; no es una simulación física exacta de DLA.
+Integrantes: Juan Carol Lugones y Germán Zariz Lüchter | 2026  
+Artes Multimediales 1 | Cátedra Groisman
