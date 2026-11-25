@@ -36,9 +36,9 @@
     { title: 'La hoja', category: 'VEGETAL · DETALLE', image: 'img/hoja8.jpg', alt: 'Nervaduras de una hoja', text: 'Al mirar de cerca, cada ramita parece repetir la forma de la hoja completa.', color: '#a9cc91' },
     { title: 'La hoja', category: 'VEGETAL · DETALLE', image: 'img/hoja9.jpg', alt: 'Nervaduras de una hoja', text: '¿Es un dibujo, o el rastro visible de algo que está circulando?', color: '#a9cc91' },
 
-    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: 'img/DLA.png', alt: '', text: 'Partículas que vagan al azar quedan pegadas al tocar un agregado. Poco a poco, el azar dibuja una forma.', color: '#d0bd91' },
-    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: 'img/DLA2.png', alt: '', text: 'Un agregado crece cuando nuevas partículas quedan atrapadas en su borde.', color: '#d0bd91' },
-    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: 'img/DLA3.png', alt: '', text: 'Cada encuentro es azaroso; la forma final parece seguir una regla.', color: '#d0bd91' },
+    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: 'img/DLA.PNG', alt: '', text: 'Partículas que vagan al azar quedan pegadas al tocar un agregado. Poco a poco, el azar dibuja una forma.', color: '#d0bd91' },
+    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: 'img/DLA2.PNG', alt: '', text: 'Un agregado crece cuando nuevas partículas quedan atrapadas en su borde.', color: '#d0bd91' },
+    { title: 'La DLA', category: 'MATERIA · PARTÍCULAS', image: 'img/DLA3.PNG', alt: '', text: 'Cada encuentro es azaroso; la forma final parece seguir una regla.', color: '#d0bd91' },
 
     { title: 'El coral', category: 'MAR · COLONIA', image: 'img/coral.jpg', alt: '', text: 'Una colonia vive como muchas. Cada organismo suma un pequeño borde a una arquitectura compartida.', color: '#c7888d' },
     { title: 'El coral', category: 'MAR · COLONIA', image: 'img/coral2.jpg', alt: '', text: 'Muchos organismos diminutos dejan una huella común sobre el arrecife.', color: '#c7888d' },
@@ -117,6 +117,7 @@
       x: node.x,
       y: node.y,
       parent: keptIds.has(node.parent) ? node.parent : null,
+      links: (node.links || []).filter(id => keptIds.has(id)),
       archived: true
     }));
     try { localStorage.setItem(storageKey, JSON.stringify(saved)); }
@@ -166,43 +167,59 @@
   function nodeById(id) { return nodes.find(node => node.id === id); }
   function updateConnections() {
     const { width, height } = stageSize();
+    const byId = new Map(nodes.map(node => [node.id, node]));
     connections.setAttribute('viewBox', `0 0 ${width} ${height}`);
     connections.replaceChildren();
+    const drawn = new Set();
     for (const node of nodes) {
-      const parent = node.parent === null ? null : nodeById(node.parent);
+      const linkIds = node.links || (node.parent === null ? [] : [node.parent]);
+      for (const linkId of linkIds) {
+      const parent = byId.get(linkId);
       if (!parent) continue;
+      const pair = [node.id, parent.id].sort((a, b) => a - b).join(':');
+      if (drawn.has(pair)) continue;
+      drawn.add(pair);
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       const dx = node.x - parent.x, dy = node.y - parent.y;
       const curve = `M ${parent.x} ${parent.y} C ${parent.x + dx * .42} ${parent.y + dy * .08}, ${parent.x + dx * .58} ${parent.y + dy * .92}, ${node.x} ${node.y}`;
       path.setAttribute('d', curve); path.setAttribute('class', `connection${node.archived ? ' archive-connection' : ''}`);
       connections.append(path);
+      }
     }
   }
-  function nearestParent(x, y, maxDistance = Infinity) {
-    let nearest = null, distance = maxDistance;
-    for (const node of nodes) {
-      const d = Math.hypot(node.x - x, node.y - y);
-      if (d < distance) { nearest = node; distance = d; }
+  function nearestNodes(x, y, count = 2) {
+    return nodes.map(node => ({ node, distance: Math.hypot(node.x - x, node.y - y) }))
+      .sort((a, b) => a.distance - b.distance).slice(0, count).map(entry => entry.node);
+  }
+  function randomFreePosition() {
+    const { width, height } = stageSize();
+    const left = (0 - panX) / scale, top = (0 - panY) / scale;
+    const right = (width - panX) / scale, bottom = (height - panY) / scale;
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const x = rand(left + 110, right - 110), y = rand(top + 105, bottom - 105);
+      const spacing = attempt < 28 ? 210 : 130;
+      if (nodes.every(node => Math.hypot(node.x - x, node.y - y) > spacing)) return { x, y };
     }
-    return nearest;
+    return { x: rand(left + 80, right - 80), y: rand(top + 80, bottom - 80) };
   }
   function createCard(point) {
     const topicIndex = Math.floor(Math.random() * topics.length);
     const topic = topics[topicIndex];
     const makeImage = Boolean(topic.image) && Math.random() < .58;
-    const angleToCursor = seedPoint && latestPoint ? Math.atan2(latestPoint.y - seedPoint.y, latestPoint.x - seedPoint.x) : rand(0, Math.PI * 2);
-    const angle = angleToCursor + (branchStep % 2 ? 1 : -1) * rand(.22, .98) + rand(-.28, .28);
-    const distance = branchStep === 0 ? 0 : rand(48, 102) + Math.min(branchStep, 8) * 10;
-    const x = point.x + Math.cos(angle) * distance;
-    const y = point.y + Math.sin(angle) * distance;
-    const parent = nearestParent(x, y);
-    const node = { id: nextId++, topic: topicIndex, type: makeImage ? 'image' : 'text', x, y, parent: parent ? parent.id : null, archived: false };
+    const position = branchStep === 0 ? point : randomFreePosition();
+    const closeItems = nearestNodes(position.x, position.y);
+    const links = closeItems.map(item => item.id);
+    const node = { id: nextId++, topic: topicIndex, type: makeImage ? 'image' : 'text', x: position.x, y: position.y, parent: links[0] ?? null, links, archived: false };
     nodes.push(node); renderNode(node);
     updateConnections(); updateCounts();
     branchStep++;
     if (nodes.length === 1) interactionHint.classList.add('is-hidden');
   }
   function beginGrowth(e) {
+    if (e.button === 2) {
+      panMode = true; panStart = { x: e.clientX, y: e.clientY, panX, panY };
+      stage.setPointerCapture?.(e.pointerId); e.preventDefault(); return;
+    }
     if (e.button !== undefined && e.button !== 0) return;
     if (e.pointerType === 'touch') {
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -213,10 +230,6 @@
         pinchStart = { distance: Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y), scale, world: worldPoint(mid.x, mid.y) };
         return;
       }
-    }
-    if (spaceDown || e.button === 1) {
-      panMode = true; panStart = { x: e.clientX, y: e.clientY, panX, panY };
-      return;
     }
     activePointer = e.pointerId; stage.setPointerCapture?.(e.pointerId);
     latestPoint = worldPoint(e.clientX, e.clientY); seedPoint = { ...latestPoint }; branchStep = 0;
@@ -266,11 +279,7 @@
     updateTransform();
   }
   function archiveCurrentMap() {
-    setActive(false); activePointer = null;
-    for (const node of nodes) { node.archived = true; node.element?.classList.add('archive'); }
-    updateConnections(); saveMap(); updateCounts();
-    memoryLabel.textContent = nodes.length ? 'EL MAPA ANTERIOR QUEDA COMO ECO' : 'UN MAPA EN POTENCIA';
-    interactionHint.classList.remove('is-hidden');
+    setActive(false); activePointer = null; saveMap(); window.location.reload();
   }
   function animationFrame(now) {
     if (active && now >= nextGrowth) {
@@ -291,15 +300,14 @@
     e.preventDefault();
     zoomAt(scale * (e.deltaY < 0 ? 1.12 : .89), e.clientX, e.clientY);
   }, { passive: false });
-  document.addEventListener('keydown', e => { if (e.code === 'Space' && !e.repeat) { spaceDown = true; e.preventDefault(); } });
-  document.addEventListener('keyup', e => { if (e.code === 'Space') spaceDown = false; });
+  stage.addEventListener('contextmenu', e => e.preventDefault());
   document.querySelector('#zoomIn').addEventListener('click', () => { const { width, height } = stageSize(); zoomAt(scale * 1.2, width / 2, height / 2); });
   document.querySelector('#zoomOut').addEventListener('click', () => { const { width, height } = stageSize(); zoomAt(scale / 1.2, width / 2, height / 2); });
   document.querySelector('#fitMap').addEventListener('click', fitMap);
   document.querySelector('#restart').addEventListener('click', archiveCurrentMap);
   window.addEventListener('resize', () => { updateConnections(); });
 
-  hintText.textContent = finePointer ? 'Posicioná el mouse y mantené el click para sumar imágenes y palabras · rueda para zoom · espacio + arrastre para moverte' : 'Mantené el dedo en un punto para sumar imágenes y palabras · pellizcá para ver de cerca';
+  hintText.textContent = finePointer ? 'Mantené el click para sumar imágenes y palabras · rueda para zoom · click derecho + arrastre para desplazarte' : 'Mantené el dedo para sumar imágenes y palabras · pellizcá para acercar y desplazarte';
   restoreMap();
   updateTransform();
   requestAnimationFrame(animationFrame);

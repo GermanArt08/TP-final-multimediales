@@ -10,11 +10,11 @@ También podés abrir `index.html` directamente o usar Live Server desde Visual 
 
 ## Cómo se recorre
 
-- Posicioná el mouse y mantené el click para sumar imágenes, textos y vínculos en ese lugar. En el teléfono, mantené el dedo presionado.
+- Posicioná el mouse y mantené el click para sumar imágenes, textos y vínculos distribuidos al azar por el espacio visible. Cada tarjeta se conecta con sus vecinas más cercanas. En el teléfono, mantené el dedo presionado.
 - Soltá para detener el crecimiento. El mapa queda visible para explorarlo.
-- Usá la rueda del mouse, los botones **+ / −**, o el gesto de pellizcar para hacer zoom. Con **Espacio + arrastre** podés desplazar el mapa en una computadora; en el teléfono, arrastrá con dos dedos.
-- **Ver mapa completo** centra y encuadra los fragmentos. **Reiniciar** atenúa el mapa actual para que quede de fondo y permite empezar otro.
-- Los mapas se guardan en `localStorage` de ese navegador y pueden reaparecer atenuados en visitas posteriores desde el mismo navegador. Cada instalación de navegador conserva su propia memoria.
+- Usá la rueda del mouse, los botones **+ / −**, o el gesto de pellizcar para hacer zoom. Mantené el **click derecho y arrastrá** para desplazarte en una computadora; en el teléfono, arrastrá con dos dedos.
+- **Ver mapa completo** centra y encuadra los fragmentos. **Reiniciar** produce el mismo efecto visual que actualizar la página: guarda el mapa y vuelve a mostrarlo atenuado para que puedas empezar otro.
+- Al actualizar la página, las imágenes, textos y conexiones quedan guardados en `localStorage` de ese navegador y reaparecen atenuados. Cada instalación de navegador conserva su propia memoria.
 
 ## Imágenes
 
